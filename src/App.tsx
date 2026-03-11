@@ -1,11 +1,13 @@
 import './App.css'
 import { useAssetStore } from './stores'
 import { useWalletView } from './stores/walletStore.ts'
+import { useToolsView } from './stores/toolsStore.ts'
 
 function App() {
   const { assets, updatePrice } = useAssetStore()
 
   const walletsView = useWalletView()
+  const toolsView = useToolsView()
 
   return (
     <>
@@ -57,6 +59,34 @@ function App() {
                   </div>
                 ))}
                 {wallet.totalUsd.toLocaleString('ru')} $
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      Tools
+      <table>
+        <thead>
+          <tr>
+            <th>id</th>
+            <th>name</th>
+            <th>Assets</th>
+          </tr>
+        </thead>
+        <tbody>
+          {toolsView.map((tool) => (
+            <tr>
+              <td>{tool.id}</td>
+              <td>{tool.name}</td>
+              <td>
+                {tool.balances.map((balance) => (
+                  <div>
+                    <span>{balance.code} </span>
+                    <span>{balance.balance.toLocaleString('ru')} </span>
+                    <span>{balance.balanceUsd.toLocaleString('ru')} $</span>
+                  </div>
+                ))}
+                {tool.totalUsd.toLocaleString('ru')} $
               </td>
             </tr>
           ))}

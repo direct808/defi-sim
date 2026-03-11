@@ -22,8 +22,16 @@ export const useTransactionStore = create<{ transactions: Transaction[] }>(
         type: 'LANDING_SUPPLY',
         walletId: 1,
         amount: 6.91,
-        landingId: 1,
+        landingId: 2,
         assetCode: 'ETH',
+        date: new Date(),
+      },
+      {
+        type: 'LANDING_SUPPLY',
+        walletId: 1,
+        amount: 0.195,
+        landingId: 1,
+        assetCode: 'BTC',
         date: new Date(),
       },
     ],
@@ -55,6 +63,13 @@ export const getWalletBalance = (id: number, asset: string) => {
       trx.type === 'WALLET_TOP_UP'
     ) {
       balance += trx.amount
+    }
+    if (
+      trx.assetCode === asset &&
+      trx.walletId === id &&
+      trx.type === 'LANDING_SUPPLY'
+    ) {
+      balance -= trx.amount
     }
   }
 
