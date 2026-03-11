@@ -56,7 +56,7 @@ export const useTransactionStore = create<{ transactions: Transaction[] }>(
   }),
 )
 
-export const getLandingBalance = (landingId: number, assetCode: string) => {
+export const getLandingSupply = (landingId: number, assetCode: string) => {
   let balance = 0
   for (const trx of useTransactionStore.getState().transactions) {
     if (

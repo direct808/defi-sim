@@ -1,6 +1,6 @@
 import type { Tool } from '../entity.ts'
 import { create } from 'zustand'
-import { getLandingBalance, getLandingBorrow } from './transactionStore.ts'
+import { getLandingSupply, getLandingBorrow } from './transactionStore.ts'
 import { useAssetStore } from './assetStore.ts'
 
 export const useToolsStore = create<{ tools: Tool[] }>(() => ({
@@ -57,7 +57,7 @@ export const useToolsView = () => {
       const asset = assets.find((a) => a.code === toolAsset.code)
       const price = asset?.price ?? 0
 
-      const supply = getLandingBalance(tool.id, toolAsset.code)
+      const supply = getLandingSupply(tool.id, toolAsset.code)
       const borrow = getLandingBorrow(tool.id, toolAsset.code)
       const supplyUsd = supply * price
       const borrowUsd = borrow * price
