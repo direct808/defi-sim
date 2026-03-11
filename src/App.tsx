@@ -23,7 +23,7 @@ function App() {
   const toolsView = useToolsView()
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 1 }}>
       <Stack spacing={1} direction="row" useFlexGap sx={{ flexWrap: 'wrap' }}>
         <Card>
           <CardHeader title="Assets" />
