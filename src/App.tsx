@@ -24,7 +24,7 @@ function App() {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Stack spacing={3}>
+      <Stack spacing={1} direction="row" useFlexGap sx={{ flexWrap: 'wrap' }}>
         <Card>
           <CardHeader title="Assets" />
           <CardContent>
