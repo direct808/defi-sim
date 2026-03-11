@@ -14,7 +14,6 @@ import {
   TableHead,
   TableRow,
   TextField,
-  Typography,
 } from '@mui/material'
 
 function App() {
@@ -57,74 +56,70 @@ function App() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader title="Wallets" />
-          <CardContent>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>ID</TableCell>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Assets</TableCell>
-                  <TableCell align="right">Total</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {walletsView.map((wallet) => (
-                  <TableRow key={wallet.id}>
-                    <TableCell>{wallet.id}</TableCell>
-                    <TableCell>{wallet.name}</TableCell>
-                    <TableCell>
-                      {wallet.balances.map((balance) => (
-                        <Typography key={balance.code} variant="body2">
-                          {balance.code}: {balance.balance.toLocaleString('ru')} ({balance.balanceUsd.toLocaleString('ru')} $)
-                        </Typography>
-                      ))}
-                    </TableCell>
-                    <TableCell align="right">
-                      {wallet.totalUsd.toLocaleString('ru')} $
-                    </TableCell>
+        {walletsView.map((wallet) => (
+          <Card key={wallet.id}>
+            <CardHeader title={wallet.name} />
+            <CardContent>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Asset</TableCell>
+                    <TableCell align="right">Balance</TableCell>
+                    <TableCell align="right">USD</TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+                </TableHead>
+                <TableBody>
+                  {wallet.balances.map((balance) => (
+                    <TableRow key={balance.code}>
+                      <TableCell>{balance.code}</TableCell>
+                      <TableCell align="right">
+                        {balance.balance.toLocaleString('ru')}
+                      </TableCell>
+                      <TableCell align="right">
+                        {balance.balanceUsd.toLocaleString('ru')} $
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        ))}
 
-        <Card>
-          <CardHeader title="Tools" />
-          <CardContent>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>ID</TableCell>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Assets</TableCell>
-                  <TableCell align="right">HF</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {toolsView.map((tool) => (
-                  <TableRow key={tool.id}>
-                    <TableCell>{tool.id}</TableCell>
-                    <TableCell>{tool.name}</TableCell>
-                    <TableCell>
-                      {tool.balances.map((balance) => (
-                        <Typography key={balance.code} variant="body2">
-                          {balance.code}: supply {balance.supply.toLocaleString('ru')} ({balance.supplyUsd.toLocaleString('ru')} $)
-                          {' / '}borrow {balance.borrow.toLocaleString('ru')} ({balance.borrowUsd.toLocaleString('ru')} $)
-                        </Typography>
-                      ))}
-                    </TableCell>
-                    <TableCell align="right">
-                      {tool.hf !== null ? tool.hf.toFixed(2) : '—'}
-                    </TableCell>
+        {toolsView.map((tool) => (
+          <Card key={tool.id}>
+            <CardHeader
+              title={tool.name}
+              subheader={`HF: ${tool.hf !== null ? tool.hf.toFixed(2) : '—'}`}
+            />
+            <CardContent>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Asset</TableCell>
+                    <TableCell align="right">Supply</TableCell>
+                    <TableCell align="right">Borrow</TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+                </TableHead>
+                <TableBody>
+                  {tool.balances.map((balance) => (
+                    <TableRow key={balance.code}>
+                      <TableCell>{balance.code}</TableCell>
+                      <TableCell align="right">
+                        {balance.supply.toLocaleString('ru')} (
+                        {balance.supplyUsd.toLocaleString('ru')} $)
+                      </TableCell>
+                      <TableCell align="right">
+                        {balance.borrow.toLocaleString('ru')} (
+                        {balance.borrowUsd.toLocaleString('ru')} $)
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        ))}
       </Stack>
     </Box>
   )
