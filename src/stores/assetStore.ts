@@ -1,34 +1,41 @@
 import type { Asset } from '../entity.ts'
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
 export const useAssetStore = create<{
   assets: Asset[]
   add: (asset: Asset) => void
   updatePrice: (assetCode: string, price: number) => void
-}>((set) => ({
-  assets: [
-    {
-      code: 'BTC',
-      price: 69300,
-    },
-    {
-      code: 'ETH',
-      price: 2022,
-    },
-    {
-      code: 'USDC',
-      price: 1,
-    },
-  ],
-  add: (asset: Asset) => set((state) => ({ assets: [...state.assets, asset] })),
+}>()(
+  persist(
+    (set) => ({
+      assets: [
+        {
+          code: 'BTC',
+          price: 69300,
+        },
+        {
+          code: 'ETH',
+          price: 2022,
+        },
+        {
+          code: 'USDC',
+          price: 1,
+        },
+      ],
+      add: (asset: Asset) =>
+        set((state) => ({ assets: [...state.assets, asset] })),
 
-  updatePrice: (assetCode: string, price: number) =>
-    set((state) => {
-      const asset = state.assets.find((asset) => asset.code === assetCode)
-      if (!asset) {
-        throw new Error('Asset not found')
-      }
-      asset.price = price
-      return { assets: [...state.assets] }
+      updatePrice: (assetCode: string, price: number) =>
+        set((state) => {
+          const asset = state.assets.find((asset) => asset.code === assetCode)
+          if (!asset) {
+            throw new Error('Asset not found')
+          }
+          asset.price = price
+          return { assets: [...state.assets] }
+        }),
     }),
-}))
+    { name: 'assets' },
+  ),
+)

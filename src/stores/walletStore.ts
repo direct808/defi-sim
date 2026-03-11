@@ -1,28 +1,37 @@
 import type { Wallet } from '../entity.ts'
 import { create } from 'zustand'
-import { getWalletBalance } from './transactionStore.ts'
+import { persist } from 'zustand/middleware'
+import { useTransactionStore, getWalletBalance } from './transactionStore.ts'
 import { useAssetStore } from './assetStore.ts'
 
-export const useWalletStore = create<{ wallets: Wallet[] }>((set) => ({
-  wallets: [
-    {
-      id: 1,
-      name: 'Base',
-      assets: ['BTC', 'ETH'],
-    },
-  ],
-  add: (wallet: Wallet) =>
-    set((state) => ({ wallets: [...state.wallets, wallet] })),
-}))
+export const useWalletStore = create<{ wallets: Wallet[] }>()(
+  persist(
+    (set) => ({
+      wallets: [
+        {
+          id: 1,
+          name: 'Base',
+          assets: ['BTC', 'ETH'],
+        },
+      ],
+      add: (wallet: Wallet) =>
+        set((state) => ({ wallets: [...state.wallets, wallet] })),
+    }),
+    { name: 'wallets' },
+  ),
+)
 
 export const useWalletView = () => {
-  return useWalletStore.getState().wallets.map((wallet) => {
+  const wallets = useWalletStore((s) => s.wallets)
+  const assets = useAssetStore((s) => s.assets)
+  useTransactionStore((s) => s.transactions) // подписка для реактивности
+
+  return wallets.map((wallet) => {
     let totalUsd = 0
     return {
       id: wallet.id,
       name: wallet.name,
-
-      balances: useAssetStore.getState().assets.map((asset) => {
+      balances: assets.map((asset) => {
         const balance = getWalletBalance(wallet.id, asset.code)
         const balanceUsd = balance * asset.price
         totalUsd += balanceUsd

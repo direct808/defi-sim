@@ -1,6 +1,10 @@
 import type { Tool } from '../entity.ts'
 import { create } from 'zustand'
-import { getLandingSupply, getLandingBorrow } from './transactionStore.ts'
+import {
+  getLandingSupply,
+  getLandingBorrow,
+  useTransactionStore,
+} from './transactionStore.ts'
 import { useAssetStore } from './assetStore.ts'
 
 export const useToolsStore = create<{ tools: Tool[] }>(() => ({
@@ -47,8 +51,11 @@ export const useToolsStore = create<{ tools: Tool[] }>(() => ({
 }))
 
 export const useToolsView = () => {
-  const assets = useAssetStore.getState().assets
-  return useToolsStore.getState().tools.map((tool) => {
+  const assets = useAssetStore((s) => s.assets)
+  const tools = useToolsStore((s) => s.tools)
+  useTransactionStore((s) => s.transactions) // подписка для реактивности
+
+  return tools.map((tool) => {
     let totalSupplyUsd = 0
     let totalBorrowUsd = 0
     let weightedCollateral = 0
