@@ -1,5 +1,4 @@
-import { useTransactionStore } from '../stores/transactionStore'
-import { useWalletStore } from '../stores/walletStore'
+import { useTransactionStore, useWalletStore, useToolsStore } from '../stores'
 import {
   Card,
   CardContent,
@@ -12,20 +11,24 @@ import {
 } from '@mui/material'
 import type { Transaction } from '../entity'
 
-function getTransactionLabel(trx: Transaction): string {
-  switch (trx.type) {
-    case 'WALLET_TOP_UP':
-      return 'Top Up'
-    case 'LANDING_SUPPLY':
-      return 'Supply'
-    case 'LANDING_BORROW':
-      return 'Borrow'
-  }
-}
-
 export function TransactionsWidget() {
   const { transactions } = useTransactionStore()
   const { wallets } = useWalletStore()
+  const { tools } = useToolsStore()
+
+  const getToolName = (id: number) =>
+    tools.find((t) => t.id === id)?.name ?? String(id)
+
+  const getTransactionLabel = (trx: Transaction): string => {
+    switch (trx.type) {
+      case 'WALLET_TOP_UP':
+        return 'Top Up'
+      case 'LANDING_SUPPLY':
+        return `Supply (${getToolName(trx.landingId)})`
+      case 'LANDING_BORROW':
+        return `Borrow (${getToolName(trx.landingId)})`
+    }
+  }
 
   const getWalletName = (id: number) =>
     wallets.find((w) => w.id === id)?.name ?? String(id)
