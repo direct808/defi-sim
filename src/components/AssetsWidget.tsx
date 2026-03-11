@@ -9,6 +9,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
   Stack,
   Table,
   TableBody,
@@ -17,6 +18,8 @@ import {
   TableRow,
   TextField,
 } from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
+import { ConfirmDialog } from './ConfirmDialog'
 
 function AddAssetDialog({
   open,
@@ -77,8 +80,9 @@ function AddAssetDialog({
 }
 
 export function AssetsWidget() {
-  const { assets, updatePrice } = useAssetStore()
+  const { assets, updatePrice, remove } = useAssetStore()
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [confirmCode, setConfirmCode] = useState<string | null>(null)
 
   return (
     <>
@@ -101,6 +105,7 @@ export function AssetsWidget() {
               <TableRow>
                 <TableCell>Code</TableCell>
                 <TableCell>Price</TableCell>
+                <TableCell />
               </TableRow>
             </TableHead>
             <TableBody>
@@ -117,6 +122,11 @@ export function AssetsWidget() {
                       }
                     />
                   </TableCell>
+                  <TableCell padding="none">
+                    <IconButton size="small" onClick={() => setConfirmCode(asset.code)}>
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -125,6 +135,18 @@ export function AssetsWidget() {
       </Card>
 
       <AddAssetDialog open={dialogOpen} onClose={() => setDialogOpen(false)} />
+
+      <ConfirmDialog
+        open={confirmCode !== null}
+        title="Удалить asset"
+        message={`Удалить ${confirmCode}?`}
+        confirmLabel="Удалить"
+        onConfirm={() => {
+          remove(confirmCode!)
+          setConfirmCode(null)
+        }}
+        onClose={() => setConfirmCode(null)}
+      />
     </>
   )
 }

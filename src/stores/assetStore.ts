@@ -5,6 +5,7 @@ import { persist } from 'zustand/middleware'
 export const useAssetStore = create<{
   assets: Asset[]
   add: (asset: Asset) => void
+  remove: (assetCode: string) => void
   updatePrice: (assetCode: string, price: number) => void
 }>()(
   persist(
@@ -25,6 +26,9 @@ export const useAssetStore = create<{
       ],
       add: (asset: Asset) =>
         set((state) => ({ assets: [...state.assets, asset] })),
+
+      remove: (assetCode: string) =>
+        set((state) => ({ assets: state.assets.filter((a) => a.code !== assetCode) })),
 
       updatePrice: (assetCode: string, price: number) =>
         set((state) => {
