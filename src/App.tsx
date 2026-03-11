@@ -8,10 +8,12 @@ import { TransactionsWidget } from './components/TransactionsWidget'
 function App() {
   return (
     <Box sx={{ p: 1 }}>
-      <Stack spacing={1} direction="row" useFlexGap sx={{ flexWrap: 'wrap' }}>
-        <AssetsWidget />
-        <WalletWidget />
-        <ToolWidget />
+      <Stack spacing={1}>
+        <Stack spacing={1} direction="row" useFlexGap sx={{ flexWrap: 'wrap' }}>
+          <AssetsWidget />
+          <WalletWidget />
+          <ToolWidget />
+        </Stack>
         <TransactionsWidget />
       </Stack>
     </Box>
