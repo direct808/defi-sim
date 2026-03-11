@@ -7,7 +7,7 @@ export const useTransactionStore = create<{ transactions: Transaction[] }>(
       {
         type: 'WALLET_TOP_UP',
         walletId: 1,
-        amount: 0.1952,
+        amount: 0.195,
         assetCode: 'BTC',
         date: new Date(),
       },
@@ -34,6 +34,22 @@ export const useTransactionStore = create<{ transactions: Transaction[] }>(
         assetCode: 'BTC',
         date: new Date(),
       },
+      {
+        type: 'LANDING_BORROW',
+        walletId: 1,
+        amount: 1483.88,
+        landingId: 1,
+        assetCode: 'USDC',
+        date: new Date(),
+      },
+      {
+        type: 'LANDING_BORROW',
+        walletId: 1,
+        amount: 4396.29,
+        landingId: 2,
+        assetCode: 'USDC',
+        date: new Date(),
+      },
     ],
     add: (transaction: Transaction) =>
       set((state) => ({ transactions: [...state.transactions, transaction] })),
@@ -45,6 +61,20 @@ export const getLandingBalance = (landingId: number, assetCode: string) => {
   for (const trx of useTransactionStore.getState().transactions) {
     if (
       trx.type === 'LANDING_SUPPLY' &&
+      trx.landingId === landingId &&
+      trx.assetCode === assetCode
+    ) {
+      balance += trx.amount
+    }
+  }
+  return balance
+}
+
+export const getLandingBorrow = (landingId: number, assetCode: string) => {
+  let balance = 0
+  for (const trx of useTransactionStore.getState().transactions) {
+    if (
+      trx.type === 'LANDING_BORROW' &&
       trx.landingId === landingId &&
       trx.assetCode === assetCode
     ) {
@@ -70,6 +100,13 @@ export const getWalletBalance = (id: number, asset: string) => {
       trx.type === 'LANDING_SUPPLY'
     ) {
       balance -= trx.amount
+    }
+    if (
+      trx.assetCode === asset &&
+      trx.walletId === id &&
+      trx.type === 'LANDING_BORROW'
+    ) {
+      balance += trx.amount
     }
   }
 

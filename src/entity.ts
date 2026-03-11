@@ -28,7 +28,15 @@ export interface LandingSupplyTransaction extends ITransaction {
   amount: number
 }
 
-export type Transaction = WalletTopUpTransaction | LandingSupplyTransaction
+export interface LandingBorrowTransaction extends ITransaction {
+  type: 'LANDING_BORROW'
+  walletId: number
+  assetCode: string
+  landingId: number
+  amount: number
+}
+
+export type Transaction = WalletTopUpTransaction | LandingSupplyTransaction | LandingBorrowTransaction
 
 export type ToolAsset = {
   code: string

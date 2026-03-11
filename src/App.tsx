@@ -71,6 +71,7 @@ function App() {
             <th>id</th>
             <th>name</th>
             <th>Assets</th>
+            <th>HF</th>
           </tr>
         </thead>
         <tbody>
@@ -82,12 +83,12 @@ function App() {
                 {tool.balances.map((balance) => (
                   <div>
                     <span>{balance.code} </span>
-                    <span>{balance.balance.toLocaleString('ru')} </span>
-                    <span>{balance.balanceUsd.toLocaleString('ru')} $</span>
+                    <span>supply: {balance.supply.toLocaleString('ru')} ({balance.supplyUsd.toLocaleString('ru')} $) </span>
+                    <span>borrow: {balance.borrow.toLocaleString('ru')} ({balance.borrowUsd.toLocaleString('ru')} $)</span>
                   </div>
                 ))}
-                {tool.totalUsd.toLocaleString('ru')} $
               </td>
+              <td>{tool.hf !== null ? tool.hf.toFixed(2) : '—'}</td>
             </tr>
           ))}
         </tbody>

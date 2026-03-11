@@ -1,6 +1,6 @@
 import type { Tool } from '../entity.ts'
 import { create } from 'zustand'
-import { getLandingBalance } from './transactionStore.ts'
+import { getLandingBalance, getLandingBorrow } from './transactionStore.ts'
 import { useAssetStore } from './assetStore.ts'
 
 export const useToolsStore = create<{ tools: Tool[] }>(() => ({
@@ -14,7 +14,7 @@ export const useToolsStore = create<{ tools: Tool[] }>(() => ({
           code: 'BTC',
           supplyApy: 0.02,
           borrowApy: 0.36,
-          ltv: 70,
+          ltv: 75,
         },
         {
           code: 'USDC',
@@ -33,7 +33,7 @@ export const useToolsStore = create<{ tools: Tool[] }>(() => ({
           code: 'ETH',
           supplyApy: 1.85,
           borrowApy: 2.53,
-          ltv: 80,
+          ltv: 85,
         },
         {
           code: 'USDC',
@@ -49,23 +49,41 @@ export const useToolsStore = create<{ tools: Tool[] }>(() => ({
 export const useToolsView = () => {
   const assets = useAssetStore.getState().assets
   return useToolsStore.getState().tools.map((tool) => {
-    let totalUsd = 0
+    let totalSupplyUsd = 0
+    let totalBorrowUsd = 0
+    let weightedCollateral = 0
+
     const balances = tool.assets.map((toolAsset) => {
       const asset = assets.find((a) => a.code === toolAsset.code)
-      const balance = getLandingBalance(tool.id, toolAsset.code)
-      const balanceUsd = balance * (asset?.price ?? 0)
-      totalUsd += balanceUsd
+      const price = asset?.price ?? 0
+
+      const supply = getLandingBalance(tool.id, toolAsset.code)
+      const borrow = getLandingBorrow(tool.id, toolAsset.code)
+      const supplyUsd = supply * price
+      const borrowUsd = borrow * price
+
+      totalSupplyUsd += supplyUsd
+      totalBorrowUsd += borrowUsd
+      weightedCollateral += supplyUsd * (toolAsset.ltv / 100)
+
       return {
         code: toolAsset.code,
-        balance,
-        balanceUsd,
+        supply,
+        supplyUsd,
+        borrow,
+        borrowUsd,
       }
     })
+
+    const hf = totalBorrowUsd > 0 ? weightedCollateral / totalBorrowUsd : null
+
     return {
       id: tool.id,
       name: tool.name,
       balances,
-      totalUsd,
+      totalSupplyUsd,
+      totalBorrowUsd,
+      hf,
     }
   })
 }

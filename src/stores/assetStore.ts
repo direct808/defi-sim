@@ -9,11 +9,15 @@ export const useAssetStore = create<{
   assets: [
     {
       code: 'BTC',
-      price: 68800,
+      price: 69300,
     },
     {
       code: 'ETH',
-      price: 2025,
+      price: 2022,
+    },
+    {
+      code: 'USDC',
+      price: 1,
     },
   ],
   add: (asset: Asset) => set((state) => ({ assets: [...state.assets, asset] })),
