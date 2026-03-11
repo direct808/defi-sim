@@ -1,0 +1,30 @@
+import type { Asset } from '../entity.ts'
+import { create } from 'zustand'
+
+export const useAssetStore = create<{
+  assets: Asset[]
+  add: (asset: Asset) => void
+  updatePrice: (assetCode: string, price: number) => void
+}>((set) => ({
+  assets: [
+    {
+      code: 'BTC',
+      price: 68800,
+    },
+    {
+      code: 'ETH',
+      price: 2025,
+    },
+  ],
+  add: (asset: Asset) => set((state) => ({ assets: [...state.assets, asset] })),
+
+  updatePrice: (assetCode: string, price: number) =>
+    set((state) => {
+      const asset = state.assets.find((asset) => asset.code === assetCode)
+      if (!asset) {
+        throw new Error('Asset not found')
+      }
+      asset.price = price
+      return { assets: [...state.assets] }
+    }),
+}))

@@ -1,30 +1,11 @@
 import './App.css'
-import { getWalletBalance, useAssetStore, useWalletStore } from './stores.ts'
+import { useAssetStore } from './stores'
+import { useWalletView } from './stores/walletStore.ts'
 
 function App() {
   const { assets, updatePrice } = useAssetStore()
 
-  const wallets = useWalletStore((sds) => sds.wallets)
-
-  const walletsView = wallets.map((wallet) => {
-    let totalUsd = 0
-    return {
-      id: wallet.id,
-      name: wallet.name,
-
-      balances: assets.map((asset) => {
-        const balance = getWalletBalance(wallet.id, asset.code)
-        const balanceUsd = balance * asset.price
-        totalUsd += balanceUsd
-        return {
-          code: asset.code,
-          balance: balance,
-          balanceUsd: balanceUsd,
-        }
-      }),
-      totalUsd,
-    }
-  })
+  const walletsView = useWalletView()
 
   return (
     <>

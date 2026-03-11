@@ -1,0 +1,62 @@
+import type { Transaction } from '../entity.ts'
+import { create } from 'zustand'
+
+export const useTransactionStore = create<{ transactions: Transaction[] }>(
+  (set) => ({
+    transactions: [
+      {
+        type: 'WALLET_TOP_UP',
+        walletId: 1,
+        amount: 0.1952,
+        assetCode: 'BTC',
+        date: new Date(),
+      },
+      {
+        type: 'WALLET_TOP_UP',
+        walletId: 1,
+        amount: 6.91,
+        assetCode: 'ETH',
+        date: new Date(),
+      },
+      {
+        type: 'LANDING_SUPPLY',
+        walletId: 1,
+        amount: 6.91,
+        landingId: 1,
+        assetCode: 'ETH',
+        date: new Date(),
+      },
+    ],
+    add: (transaction: Transaction) =>
+      set((state) => ({ transactions: [...state.transactions, transaction] })),
+  }),
+)
+
+export const getLandingBalance = (landingId: number, assetCode: string) => {
+  let balance = 0
+  for (const trx of useTransactionStore.getState().transactions) {
+    if (
+      trx.type === 'LANDING_SUPPLY' &&
+      trx.landingId === landingId &&
+      trx.assetCode === assetCode
+    ) {
+      balance += trx.amount
+    }
+  }
+  return balance
+}
+
+export const getWalletBalance = (id: number, asset: string) => {
+  let balance = 0
+  for (const trx of useTransactionStore.getState().transactions) {
+    if (
+      trx.assetCode === asset &&
+      trx.walletId === id &&
+      trx.type === 'WALLET_TOP_UP'
+    ) {
+      balance += trx.amount
+    }
+  }
+
+  return balance
+}
