@@ -8,7 +8,18 @@ import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 import { createTheme, CssBaseline, ThemeProvider } from '@mui/material'
 
-const darkTheme = createTheme({ palette: { mode: 'dark' } })
+const darkTheme = createTheme({
+  palette: { mode: 'dark' },
+  components: {
+    MuiOutlinedInput: {
+      styleOverrides: {
+        input: {
+          padding: '4px 6px',
+        },
+      },
+    },
+  },
+})
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
