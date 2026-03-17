@@ -33,6 +33,7 @@ type ModalState = {
 type WithdrawModalState = {
   walletId: number
   assetCode: string
+  maxBalance: number
 }
 
 type DeleteModalState = {
@@ -64,8 +65,8 @@ export function WalletWidget() {
     setDate(new Date().toISOString().slice(0, 10))
   }
 
-  const openWithdrawModal = (walletId: number, assetCode: string) => {
-    setWithdrawModal({ walletId, assetCode })
+  const openWithdrawModal = (walletId: number, assetCode: string, maxBalance: number) => {
+    setWithdrawModal({ walletId, assetCode, maxBalance })
     setWithdrawAmount('')
     setWithdrawDate(new Date().toISOString().slice(0, 10))
   }
@@ -132,7 +133,7 @@ export function WalletWidget() {
                     <TableCell align="right" sx={{ py: 0 }}>
                       <IconButton
                         size="small"
-                        onClick={() => openWithdrawModal(wallet.id, balance.code)}
+                        onClick={() => openWithdrawModal(wallet.id, balance.code, balance.balance)}
                       >
                         <CallReceivedIcon fontSize="small" />
                       </IconButton>
@@ -193,6 +194,16 @@ export function WalletWidget() {
               value={withdrawAmount}
               onChange={(e) => setWithdrawAmount(e.target.value)}
               fullWidth
+              error={
+                !!withdrawAmount &&
+                parseFloat(withdrawAmount) > (withdrawModal?.maxBalance ?? 0)
+              }
+              helperText={
+                !!withdrawAmount &&
+                parseFloat(withdrawAmount) > (withdrawModal?.maxBalance ?? 0)
+                  ? `Max available: ${withdrawModal?.maxBalance}`
+                  : undefined
+              }
             />
             <TextField
               size="small"
@@ -212,7 +223,11 @@ export function WalletWidget() {
             size="small"
             variant="contained"
             onClick={handleWithdraw}
-            disabled={!withdrawAmount}
+            disabled={
+              !withdrawAmount ||
+              parseFloat(withdrawAmount) <= 0 ||
+              parseFloat(withdrawAmount) > (withdrawModal?.maxBalance ?? 0)
+            }
           >
             Withdraw
           </Button>
