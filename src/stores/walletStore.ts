@@ -11,7 +11,6 @@ export const useWalletStore = create<{ wallets: Wallet[] }>()(
         {
           id: 1,
           name: 'Base',
-          assets: ['BTC', 'ETH'],
         },
       ],
       add: (wallet: Wallet) =>
@@ -26,12 +25,17 @@ export const useWalletView = () => {
   const assets = useAssetStore((s) => s.assets)
   useTransactionStore((s) => s.transactions) // подписка для реактивности
 
+  const transactions = useTransactionStore.getState().transactions
   return wallets.map((wallet) => {
+    const assetCodesWithTxs = new Set(
+      transactions
+        .filter((t) => t.walletId === wallet.id)
+        .map((t) => t.assetCode),
+    )
     let totalUsd = 0
-    return {
-      id: wallet.id,
-      name: wallet.name,
-      balances: assets.map((asset) => {
+    const balances = assets
+      .filter((asset) => assetCodesWithTxs.has(asset.code))
+      .map((asset) => {
         const balance = getWalletBalance(wallet.id, asset.code)
         const balanceUsd = balance * asset.price
         totalUsd += balanceUsd
@@ -40,7 +44,11 @@ export const useWalletView = () => {
           balance: balance,
           balanceUsd: balanceUsd,
         }
-      }),
+      })
+    return {
+      id: wallet.id,
+      name: wallet.name,
+      balances,
       totalUsd,
     }
   })

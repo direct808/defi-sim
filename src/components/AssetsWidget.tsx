@@ -66,8 +66,11 @@ function AddAssetDialog({
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleCancel}>Отмена</Button>
+        <Button size="small" onClick={handleCancel}>
+          Отмена
+        </Button>
         <Button
+          size="small"
           variant="contained"
           onClick={handleSave}
           disabled={!code || !price}
@@ -123,7 +126,10 @@ export function AssetsWidget() {
                     />
                   </TableCell>
                   <TableCell padding="none">
-                    <IconButton size="small" onClick={() => setConfirmCode(asset.code)}>
+                    <IconButton
+                      size="small"
+                      onClick={() => setConfirmCode(asset.code)}
+                    >
                       <CloseIcon fontSize="small" />
                     </IconButton>
                   </TableCell>

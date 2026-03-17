@@ -1,7 +1,6 @@
 export type Wallet = {
   id: number
   name: string
-  assets: string[]
 }
 
 export type Asset = {
@@ -36,7 +35,10 @@ export interface LandingBorrowTransaction extends ITransaction {
   amount: number
 }
 
-export type Transaction = WalletTopUpTransaction | LandingSupplyTransaction | LandingBorrowTransaction
+export type Transaction =
+  | WalletTopUpTransaction
+  | LandingSupplyTransaction
+  | LandingBorrowTransaction
 
 export type ToolAsset = {
   code: string
