@@ -79,6 +79,9 @@ export const useToolsView = () => {
         supplyUsd,
         borrow,
         borrowUsd,
+        supplyApy: toolAsset.supplyApy,
+        borrowApy: toolAsset.borrowApy,
+        ltv: toolAsset.ltv,
       }
     })
 
@@ -87,6 +90,7 @@ export const useToolsView = () => {
     return {
       id: tool.id,
       name: tool.name,
+      type: tool.type,
       balances,
       totalSupplyUsd,
       totalBorrowUsd,

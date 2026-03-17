@@ -48,16 +48,18 @@ export type Transaction =
   | LandingSupplyTransaction
   | LandingBorrowTransaction
 
-export type ToolAsset = {
+export type LandingAsset = {
   code: string
   supplyApy: number
   borrowApy: number
   ltv: number
 }
 
-export type Tool = {
+export type Tool = ToolLanding
+
+export type ToolLanding = {
   id: number
   name: string
   type: 'LANDING'
-  assets: ToolAsset[]
+  assets: LandingAsset[]
 }
