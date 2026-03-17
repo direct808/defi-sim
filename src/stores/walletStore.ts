@@ -4,7 +4,7 @@ import { persist } from 'zustand/middleware'
 import { useTransactionStore, getWalletBalance } from './transactionStore.ts'
 import { useAssetStore } from './assetStore.ts'
 
-export const useWalletStore = create<{ wallets: Wallet[] }>()(
+export const useWalletStore = create<{ wallets: Wallet[]; add: (wallet: Wallet) => void }>()(
   persist(
     (set) => ({
       wallets: [

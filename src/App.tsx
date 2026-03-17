@@ -4,18 +4,27 @@ import { AssetsWidget } from './components/AssetsWidget'
 import { WalletWidget } from './components/WalletWidget'
 import { ToolWidget } from './components/ToolWidget'
 import { TransactionsWidget } from './components/TransactionsWidget'
+import { Toolbar } from './components/Toolbar'
 
 function App() {
   return (
-    <Box sx={{ p: 1 }}>
-      <Stack spacing={1}>
-        <Stack spacing={1} direction="row" useFlexGap sx={{ flexWrap: 'wrap' }}>
-          <AssetsWidget />
-          <WalletWidget />
-          <ToolWidget />
+    <Box>
+      <Toolbar />
+      <Box sx={{ p: 1 }}>
+        <Stack spacing={1}>
+          <Stack
+            spacing={1}
+            direction="row"
+            useFlexGap
+            sx={{ flexWrap: 'wrap' }}
+          >
+            <AssetsWidget />
+            <WalletWidget />
+            <ToolWidget />
+          </Stack>
+          <TransactionsWidget />
         </Stack>
-        <TransactionsWidget />
-      </Stack>
+      </Box>
     </Box>
   )
 }
