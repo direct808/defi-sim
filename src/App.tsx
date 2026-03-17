@@ -1,7 +1,7 @@
 import './App.css'
 import { Box, Stack } from '@mui/material'
 import { AssetsWidget } from './components/AssetsWidget'
-import { WalletWidget } from './components/WalletWidget'
+import { WalletWidget } from './components/wallet'
 import { ToolWidget } from './components/ToolWidget'
 import { TransactionsWidget } from './components/TransactionsWidget'
 import { Toolbar } from './components/Toolbar'
