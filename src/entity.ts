@@ -27,6 +27,13 @@ export interface LandingSupplyTransaction extends ITransaction {
   amount: number
 }
 
+export interface WalletWithdrawTransaction extends ITransaction {
+  type: 'WALLET_WITHDRAW'
+  walletId: number
+  assetCode: string
+  amount: number
+}
+
 export interface LandingBorrowTransaction extends ITransaction {
   type: 'LANDING_BORROW'
   walletId: number
@@ -37,6 +44,7 @@ export interface LandingBorrowTransaction extends ITransaction {
 
 export type Transaction =
   | WalletTopUpTransaction
+  | WalletWithdrawTransaction
   | LandingSupplyTransaction
   | LandingBorrowTransaction
 

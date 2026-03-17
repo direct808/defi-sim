@@ -3,6 +3,7 @@ import { useAssetStore } from '../stores/assetStore'
 import { useWalletView, useWalletStore } from '../stores/walletStore'
 import { useTransactionStore } from '../stores/transactionStore'
 import DeleteIcon from '@mui/icons-material/Delete'
+import CallReceivedIcon from '@mui/icons-material/CallReceived'
 import {
   Button,
   Card,
@@ -29,6 +30,11 @@ type ModalState = {
   walletId: number
 }
 
+type WithdrawModalState = {
+  walletId: number
+  assetCode: string
+}
+
 type DeleteModalState = {
   walletId: number
   walletName: string
@@ -45,6 +51,10 @@ export function WalletWidget() {
   const [amount, setAmount] = useState('')
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10))
 
+  const [withdrawModal, setWithdrawModal] = useState<WithdrawModalState | null>(null)
+  const [withdrawAmount, setWithdrawAmount] = useState('')
+  const [withdrawDate, setWithdrawDate] = useState(() => new Date().toISOString().slice(0, 10))
+
   const [deleteModal, setDeleteModal] = useState<DeleteModalState | null>(null)
 
   const openModal = (walletId: number) => {
@@ -54,7 +64,15 @@ export function WalletWidget() {
     setDate(new Date().toISOString().slice(0, 10))
   }
 
+  const openWithdrawModal = (walletId: number, assetCode: string) => {
+    setWithdrawModal({ walletId, assetCode })
+    setWithdrawAmount('')
+    setWithdrawDate(new Date().toISOString().slice(0, 10))
+  }
+
   const handleCancel = () => setModal(null)
+
+  const handleWithdrawCancel = () => setWithdrawModal(null)
 
   const handleDeleteConfirm = () => {
     if (!deleteModal) return
@@ -74,6 +92,18 @@ export function WalletWidget() {
     setModal(null)
   }
 
+  const handleWithdraw = () => {
+    if (!withdrawModal || !withdrawAmount) return
+    addTransaction({
+      type: 'WALLET_WITHDRAW',
+      walletId: withdrawModal.walletId,
+      assetCode: withdrawModal.assetCode,
+      amount: parseFloat(withdrawAmount),
+      date: new Date(withdrawDate),
+    })
+    setWithdrawModal(null)
+  }
+
   return (
     <>
       {walletsView.map((wallet) => (
@@ -86,6 +116,7 @@ export function WalletWidget() {
                   <TableCell>Asset</TableCell>
                   <TableCell align="right">Balance</TableCell>
                   <TableCell align="right">USD</TableCell>
+                  <TableCell />
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -97,6 +128,14 @@ export function WalletWidget() {
                     </TableCell>
                     <TableCell align="right">
                       {balance.balanceUsd.toLocaleString('ru')} $
+                    </TableCell>
+                    <TableCell align="right" sx={{ py: 0 }}>
+                      <IconButton
+                        size="small"
+                        onClick={() => openWithdrawModal(wallet.id, balance.code)}
+                      >
+                        <CallReceivedIcon fontSize="small" />
+                      </IconButton>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -139,6 +178,43 @@ export function WalletWidget() {
             onClick={handleDeleteConfirm}
           >
             Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={withdrawModal !== null} onClose={handleWithdrawCancel}>
+        <DialogTitle>Withdraw — {withdrawModal?.assetCode}</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} sx={{ pt: 1 }}>
+            <TextField
+              size="small"
+              label="Amount"
+              type="number"
+              value={withdrawAmount}
+              onChange={(e) => setWithdrawAmount(e.target.value)}
+              fullWidth
+            />
+            <TextField
+              size="small"
+              label="Date"
+              type="date"
+              value={withdrawDate}
+              onChange={(e) => setWithdrawDate(e.target.value)}
+              fullWidth
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleWithdrawCancel} size="small">
+            Cancel
+          </Button>
+          <Button
+            size="small"
+            variant="contained"
+            onClick={handleWithdraw}
+            disabled={!withdrawAmount}
+          >
+            Withdraw
           </Button>
         </DialogActions>
       </Dialog>

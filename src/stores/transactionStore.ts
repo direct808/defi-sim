@@ -133,6 +133,13 @@ export const getWalletBalance = (id: number, asset: string) => {
     if (
       trx.assetCode === asset &&
       trx.walletId === id &&
+      trx.type === 'WALLET_WITHDRAW'
+    ) {
+      balance -= trx.amount
+    }
+    if (
+      trx.assetCode === asset &&
+      trx.walletId === id &&
       trx.type === 'LANDING_BORROW'
     ) {
       balance += trx.amount

@@ -32,6 +32,8 @@ export function TransactionsWidget() {
         return `Supply (${getToolName(trx.landingId)})`
       case 'LANDING_BORROW':
         return `Borrow (${getToolName(trx.landingId)})`
+      case 'WALLET_WITHDRAW':
+        return 'Withdraw'
     }
   }
 
