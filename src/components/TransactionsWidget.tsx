@@ -1,20 +1,25 @@
+import { useState } from 'react'
 import { useTransactionStore, useWalletStore, useToolsStore } from '../stores'
 import {
   Card,
   CardContent,
   CardHeader,
+  IconButton,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
 } from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
 import type { Transaction } from '../entity'
+import { ConfirmDialog } from './ConfirmDialog'
 
 export function TransactionsWidget() {
-  const { transactions } = useTransactionStore()
+  const { transactions, remove } = useTransactionStore()
   const { wallets } = useWalletStore()
   const { tools } = useToolsStore()
+  const [confirmIndex, setConfirmIndex] = useState<number | null>(null)
 
   const getToolName = (id: number) =>
     tools.find((t) => t.id === id)?.name ?? String(id)
@@ -34,34 +39,54 @@ export function TransactionsWidget() {
     wallets.find((w) => w.id === id)?.name ?? String(id)
 
   return (
-    <Card>
-      <CardHeader title="Transactions" />
-      <CardContent>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>Date</TableCell>
-              <TableCell>Type</TableCell>
-              <TableCell>Wallet</TableCell>
-              <TableCell>Asset</TableCell>
-              <TableCell align="right">Amount</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {transactions.map((trx, i) => (
-              <TableRow key={i}>
-                <TableCell>{trx.date.toLocaleDateString('ru')}</TableCell>
-                <TableCell>{getTransactionLabel(trx)}</TableCell>
-                <TableCell>{getWalletName(trx.walletId)}</TableCell>
-                <TableCell>{trx.assetCode}</TableCell>
-                <TableCell align="right">
-                  {trx.amount.toLocaleString('ru')}
-                </TableCell>
+    <>
+      <Card>
+        <CardHeader title="Transactions" />
+        <CardContent>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>Date</TableCell>
+                <TableCell>Type</TableCell>
+                <TableCell>Wallet</TableCell>
+                <TableCell>Asset</TableCell>
+                <TableCell align="right">Amount</TableCell>
+                <TableCell />
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+            </TableHead>
+            <TableBody>
+              {transactions.map((trx, i) => (
+                <TableRow key={i}>
+                  <TableCell>{trx.date.toLocaleDateString('ru')}</TableCell>
+                  <TableCell>{getTransactionLabel(trx)}</TableCell>
+                  <TableCell>{getWalletName(trx.walletId)}</TableCell>
+                  <TableCell>{trx.assetCode}</TableCell>
+                  <TableCell align="right">
+                    {trx.amount.toLocaleString('ru')}
+                  </TableCell>
+                  <TableCell padding="none">
+                    <IconButton size="small" onClick={() => setConfirmIndex(i)}>
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <ConfirmDialog
+        open={confirmIndex !== null}
+        title="Удалить транзакцию"
+        message="Удалить транзакцию?"
+        confirmLabel="Удалить"
+        onConfirm={() => {
+          remove(confirmIndex!)
+          setConfirmIndex(null)
+        }}
+        onClose={() => setConfirmIndex(null)}
+      />
+    </>
   )
 }

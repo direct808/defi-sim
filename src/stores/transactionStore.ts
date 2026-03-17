@@ -2,7 +2,11 @@ import type { Transaction } from '../entity.ts'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export const useTransactionStore = create<{ transactions: Transaction[] }>()(
+export const useTransactionStore = create<{
+  transactions: Transaction[]
+  add: (transaction: Transaction) => void
+  remove: (index: number) => void
+}>()(
   persist(
     (set) => ({
       transactions: [
@@ -56,6 +60,10 @@ export const useTransactionStore = create<{ transactions: Transaction[] }>()(
       add: (transaction: Transaction) =>
         set((state) => ({
           transactions: [...state.transactions, transaction],
+        })),
+      remove: (index: number) =>
+        set((state) => ({
+          transactions: state.transactions.filter((_, i) => i !== index),
         })),
     }),
     {
