@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useAssetStore } from '../stores/assetStore'
-import { useWalletView } from '../stores/walletStore'
+import { useWalletView, useWalletStore } from '../stores/walletStore'
 import { useTransactionStore } from '../stores/transactionStore'
+import DeleteIcon from '@mui/icons-material/Delete'
 import {
   Button,
   Card,
@@ -11,7 +12,9 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  DialogContentText,
   DialogTitle,
+  IconButton,
   MenuItem,
   Stack,
   Table,
@@ -26,15 +29,23 @@ type ModalState = {
   walletId: number
 }
 
+type DeleteModalState = {
+  walletId: number
+  walletName: string
+}
+
 export function WalletWidget() {
   const walletsView = useWalletView()
   const addTransaction = useTransactionStore((s) => s.add)
   const assets = useAssetStore((s) => s.assets)
+  const removeWallet = useWalletStore((s) => s.remove)
 
   const [modal, setModal] = useState<ModalState | null>(null)
   const [assetCode, setAssetCode] = useState('')
   const [amount, setAmount] = useState('')
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10))
+
+  const [deleteModal, setDeleteModal] = useState<DeleteModalState | null>(null)
 
   const openModal = (walletId: number) => {
     setModal({ walletId })
@@ -44,6 +55,12 @@ export function WalletWidget() {
   }
 
   const handleCancel = () => setModal(null)
+
+  const handleDeleteConfirm = () => {
+    if (!deleteModal) return
+    removeWallet(deleteModal.walletId)
+    setDeleteModal(null)
+  }
 
   const handleAdd = () => {
     if (!modal || !amount || !assetCode) return
@@ -90,9 +107,41 @@ export function WalletWidget() {
             <Button size="small" onClick={() => openModal(wallet.id)}>
               Top up
             </Button>
+            <IconButton
+              size="small"
+              color="error"
+              onClick={() =>
+                setDeleteModal({ walletId: wallet.id, walletName: wallet.name })
+              }
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
           </CardActions>
         </Card>
       ))}
+
+      <Dialog open={deleteModal !== null} onClose={() => setDeleteModal(null)}>
+        <DialogTitle>Delete wallet</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete &quot;{deleteModal?.walletName}
+            &quot;?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button size="small" onClick={() => setDeleteModal(null)}>
+            Cancel
+          </Button>
+          <Button
+            size="small"
+            variant="contained"
+            color="error"
+            onClick={handleDeleteConfirm}
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Dialog open={modal !== null} onClose={handleCancel}>
         <DialogTitle>Top up</DialogTitle>

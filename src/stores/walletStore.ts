@@ -4,7 +4,11 @@ import { persist } from 'zustand/middleware'
 import { useTransactionStore, getWalletBalance } from './transactionStore.ts'
 import { useAssetStore } from './assetStore.ts'
 
-export const useWalletStore = create<{ wallets: Wallet[]; add: (wallet: Wallet) => void }>()(
+export const useWalletStore = create<{
+  wallets: Wallet[]
+  add: (wallet: Wallet) => void
+  remove: (id: number) => void
+}>()(
   persist(
     (set) => ({
       wallets: [
@@ -15,6 +19,10 @@ export const useWalletStore = create<{ wallets: Wallet[]; add: (wallet: Wallet) 
       ],
       add: (wallet: Wallet) =>
         set((state) => ({ wallets: [...state.wallets, wallet] })),
+      remove: (id: number) => {
+        useTransactionStore.getState().removeByWallet(id)
+        set((state) => ({ wallets: state.wallets.filter((w) => w.id !== id) }))
+      },
     }),
     { name: 'wallets' },
   ),

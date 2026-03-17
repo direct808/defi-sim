@@ -6,6 +6,7 @@ export const useTransactionStore = create<{
   transactions: Transaction[]
   add: (transaction: Transaction) => void
   remove: (index: number) => void
+  removeByWallet: (walletId: number) => void
 }>()(
   persist(
     (set) => ({
@@ -64,6 +65,10 @@ export const useTransactionStore = create<{
       remove: (index: number) =>
         set((state) => ({
           transactions: state.transactions.filter((_, i) => i !== index),
+        })),
+      removeByWallet: (walletId: number) =>
+        set((state) => ({
+          transactions: state.transactions.filter((t) => t.walletId !== walletId),
         })),
     }),
     {
