@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import {
+  Button,
   Card,
   CardContent,
   CardHeader,
@@ -8,6 +10,7 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material'
+import { LandingSupplyDialog } from './LandingSupplyDialog'
 
 type Balance = {
   code: string
@@ -27,12 +30,24 @@ type Props = {
   balances: Balance[]
 }
 
-export function LandingToolCard({ name, hf, balances }: Props) {
+export function LandingToolCard({ id, name, hf, balances }: Props) {
+  const [supplyOpen, setSupplyOpen] = useState(false)
+
   return (
     <Card>
       <CardHeader
         title={name}
         subheader={`HF: ${hf !== null ? hf.toFixed(2) : '—'}`}
+        action={
+          <Button size="small" variant="outlined" onClick={() => setSupplyOpen(true)}>
+            Supply
+          </Button>
+        }
+      />
+      <LandingSupplyDialog
+        open={supplyOpen}
+        landingId={id}
+        onClose={() => setSupplyOpen(false)}
       />
       <CardContent>
         <Table size="small">
