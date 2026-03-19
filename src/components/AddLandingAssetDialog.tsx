@@ -33,6 +33,7 @@ interface Props {
 
 export function AddLandingAssetDialog({ open, toolId, onClose }: Props) {
   const assets = useAssetStore((s) => s.assets)
+  const toolAssets = useToolsStore((s) => s.tools.find((t) => t.id === toolId)?.assets ?? [])
   const addAssetToTool = useToolsStore((s) => s.addAssetToTool)
 
   const {
@@ -40,6 +41,7 @@ export function AddLandingAssetDialog({ open, toolId, onClose }: Props) {
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -52,6 +54,10 @@ export function AddLandingAssetDialog({ open, toolId, onClose }: Props) {
   }
 
   const onSubmit = (data: FormValues) => {
+    if (toolAssets.some((a) => a.code === data.code)) {
+      setError('code', { message: 'Asset already added' })
+      return
+    }
     addAssetToTool(toolId, data)
     handleClose()
   }
