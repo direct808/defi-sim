@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useAssetStore } from '../stores/assetStore'
-import { useWalletStore } from '../stores/walletStore'
 import { useTransactionStore } from '../stores/transactionStore'
 import {
   Button,
@@ -16,32 +15,38 @@ import {
 type Props = {
   open: boolean
   landingId: number
+  walletId: number
   onClose: () => void
 }
 
-export function LandingSupplyDialog({ open, landingId, onClose }: Props) {
+export function LandingSupplyDialog({
+  open,
+  landingId,
+  walletId,
+  onClose,
+}: Props) {
   const assets = useAssetStore((s) => s.assets)
-  const wallets = useWalletStore((s) => s.wallets)
   const addTransaction = useTransactionStore((s) => s.add)
 
   const [assetCode, setAssetCode] = useState(() => assets[0]?.code ?? '')
   const [amount, setAmount] = useState('')
-  const [walletId, setWalletId] = useState(() => wallets[0]?.id ?? 0)
+  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10))
 
   const handleClose = () => {
     setAmount('')
+    setDate(new Date().toISOString().slice(0, 10))
     onClose()
   }
 
   const handleAdd = () => {
-    if (!amount || !assetCode || !walletId) return
+    if (!amount || !assetCode) return
     addTransaction({
       type: 'LANDING_SUPPLY',
       landingId,
       walletId,
       assetCode,
       amount: parseFloat(amount),
-      date: new Date(),
+      date: new Date(date),
     })
     handleClose()
   }
@@ -74,19 +79,13 @@ export function LandingSupplyDialog({ open, landingId, onClose }: Props) {
             fullWidth
           />
           <TextField
-            select
             size="small"
-            label="Wallet"
-            value={walletId}
-            onChange={(e) => setWalletId(Number(e.target.value))}
+            label="Date"
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
             fullWidth
-          >
-            {wallets.map((wallet) => (
-              <MenuItem key={wallet.id} value={wallet.id}>
-                {wallet.name}
-              </MenuItem>
-            ))}
-          </TextField>
+          />
         </Stack>
       </DialogContent>
       <DialogActions>
@@ -97,7 +96,7 @@ export function LandingSupplyDialog({ open, landingId, onClose }: Props) {
           size="small"
           variant="contained"
           onClick={handleAdd}
-          disabled={!amount || !assetCode || !walletId}
+          disabled={!amount || !assetCode}
         >
           Add
         </Button>

@@ -14,7 +14,11 @@ export const useWalletStore = create<{
       wallets: [
         {
           id: 1,
-          name: 'Base',
+          name: 'Base - Avalanche',
+        },
+        {
+          id: 2,
+          name: 'Base - Arbitrum',
         },
       ],
       add: (wallet: Wallet) =>

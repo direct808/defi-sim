@@ -61,5 +61,6 @@ export type ToolLanding = {
   id: number
   name: string
   type: 'LANDING'
+  walletId: number
   assets: LandingAsset[]
 }

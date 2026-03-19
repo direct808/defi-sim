@@ -7,12 +7,14 @@ import {
 } from './transactionStore.ts'
 import { useAssetStore } from './assetStore.ts'
 
-export const useToolsStore = create<{ tools: Tool[] }>(() => ({
+export const useToolsStore = create<{ tools: Tool[]; removeTool: (id: number) => void }>((set) => ({
+  removeTool: (id) => set((s) => ({ tools: s.tools.filter((t) => t.id !== id) })),
   tools: [
     {
       id: 1,
       name: 'Aave - Avalanche',
       type: 'LANDING',
+      walletId: 1,
       assets: [
         {
           code: 'BTC',
@@ -30,6 +32,7 @@ export const useToolsStore = create<{ tools: Tool[] }>(() => ({
     },
     {
       id: 2,
+      walletId: 2,
       name: 'Aave - Arbitrum',
       type: 'LANDING',
       assets: [
