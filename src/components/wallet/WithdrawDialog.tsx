@@ -1,4 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useMemo } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { useTransactionStore } from '../../stores'
 import {
   Button,
@@ -16,6 +19,11 @@ export type WithdrawModalState = {
   maxBalance: number
 }
 
+type FormValues = {
+  amount: number
+  date: string
+}
+
 export function WithdrawDialog({
   state,
   onClose,
@@ -25,70 +33,88 @@ export function WithdrawDialog({
 }) {
   const addTransaction = useTransactionStore((s) => s.add)
 
-  const [amount, setAmount] = useState('')
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10))
+  const schema = useMemo(
+    () =>
+      z.object({
+        amount: z
+          .number()
+          .positive('Must be > 0')
+          .max(state?.maxBalance ?? Number.MAX_VALUE, `Max available: ${state?.maxBalance}`),
+        date: z.string().min(1, 'Select a date'),
+      }),
+    [state?.maxBalance],
+  )
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      amount: 0,
+      date: new Date().toISOString().slice(0, 10),
+    },
+  })
+
+  useEffect(() => {
+    if (state !== null) {
+      reset({ amount: 0, date: new Date().toISOString().slice(0, 10) })
+    }
+  }, [state, reset])
 
   const handleClose = () => {
-    setAmount('')
-    setDate(new Date().toISOString().slice(0, 10))
+    reset()
     onClose()
   }
 
-  const handleWithdraw = () => {
-    if (!state || !amount) return
+  const onSubmit = (data: FormValues) => {
     addTransaction({
       type: 'WALLET_WITHDRAW',
-      walletId: state.walletId,
-      assetCode: state.assetCode,
-      amount: parseFloat(amount),
-      date: new Date(date),
+      walletId: state!.walletId,
+      assetCode: state!.assetCode,
+      amount: data.amount,
+      date: new Date(data.date),
     })
     handleClose()
   }
 
-  const parsedAmount = parseFloat(amount)
-  const overMax = !!amount && parsedAmount > (state?.maxBalance ?? 0)
-
   return (
     <Dialog open={state !== null} onClose={handleClose}>
       <DialogTitle>Withdraw — {state?.assetCode}</DialogTitle>
-      <DialogContent>
-        <Stack spacing={2} sx={{ pt: 1 }}>
-          <TextField
-            size="small"
-            label="Amount"
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            fullWidth
-            error={overMax}
-            helperText={
-              overMax ? `Max available: ${state?.maxBalance}` : undefined
-            }
-          />
-          <TextField
-            size="small"
-            label="Date"
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            fullWidth
-          />
-        </Stack>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} size="small">
-          Cancel
-        </Button>
-        <Button
-          size="small"
-          variant="contained"
-          onClick={handleWithdraw}
-          disabled={!amount || parsedAmount <= 0 || overMax}
-        >
-          Withdraw
-        </Button>
-      </DialogActions>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <DialogContent>
+          <Stack spacing={2} sx={{ pt: 1 }}>
+            <TextField
+              size="small"
+              label="Amount"
+              type="number"
+              fullWidth
+              error={!!errors.amount}
+              helperText={errors.amount?.message}
+              {...register('amount', { valueAsNumber: true })}
+            />
+            <TextField
+              size="small"
+              label="Date"
+              type="date"
+              fullWidth
+              error={!!errors.date}
+              helperText={errors.date?.message}
+              {...register('date')}
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} size="small">
+            Cancel
+          </Button>
+          <Button size="small" variant="contained" type="submit">
+            Withdraw
+          </Button>
+        </DialogActions>
+      </form>
     </Dialog>
   )
 }

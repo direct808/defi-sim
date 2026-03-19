@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import {
   Button,
   Dialog,
@@ -6,13 +8,22 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
+  FormHelperText,
   InputLabel,
   MenuItem,
   Select,
   TextField,
 } from '@mui/material'
-import { useAssetStore } from '../stores/assetStore'
-import { useToolsStore } from '../stores/toolsStore'
+import { useAssetStore, useToolsStore } from '../stores'
+
+const schema = z.object({
+  code: z.string().min(1, 'Select an asset'),
+  supplyApy: z.number().min(0, 'Min 0').max(100, 'Max 100'),
+  borrowApy: z.number().min(0, 'Min 0').max(100, 'Max 100'),
+  ltv: z.number().min(0, 'Min 0').max(100, 'Max 100'),
+})
+
+type FormValues = z.infer<typeof schema>
 
 interface Props {
   open: boolean
@@ -24,94 +35,91 @@ export function AddLandingAssetDialog({ open, toolId, onClose }: Props) {
   const assets = useAssetStore((s) => s.assets)
   const addAssetToTool = useToolsStore((s) => s.addAssetToTool)
 
-  const [code, setCode] = useState<string>('')
-  const [supplyApy, setSupplyApy] = useState('')
-  const [borrowApy, setBorrowApy] = useState('')
-  const [ltv, setLtv] = useState('')
-
-  const handleAdd = () => {
-    if (!code || supplyApy === '' || borrowApy === '' || ltv === '') return
-    addAssetToTool(toolId, {
-      code,
-      supplyApy: Number(supplyApy),
-      borrowApy: Number(borrowApy),
-      ltv: Number(ltv),
-    })
-    handleClose()
-  }
+  const {
+    control,
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: { code: '', supplyApy: 0, borrowApy: 0, ltv: 0 },
+  })
 
   const handleClose = () => {
-    setCode('')
-    setSupplyApy('')
-    setBorrowApy('')
-    setLtv('')
+    reset()
     onClose()
   }
 
-  const isValid =
-    code !== '' &&
-    supplyApy !== '' &&
-    borrowApy !== '' &&
-    ltv !== '' &&
-    Number(supplyApy) >= 0 &&
-    Number(supplyApy) <= 100 &&
-    Number(borrowApy) >= 0 &&
-    Number(borrowApy) <= 100 &&
-    Number(ltv) >= 0 &&
-    Number(ltv) <= 100
+  const onSubmit = (data: FormValues) => {
+    addAssetToTool(toolId, data)
+    handleClose()
+  }
 
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Add Asset</DialogTitle>
-      <DialogContent>
-        <FormControl size="small" fullWidth sx={{ mt: 1, mb: 2 }}>
-          <InputLabel>Asset</InputLabel>
-          <Select label="Asset" value={code} onChange={(e) => setCode(e.target.value)}>
-            {assets.map((a) => (
-              <MenuItem key={a.code} value={a.code}>
-                {a.code}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <TextField
-          size="small"
-          label="Supply APY (%)"
-          type="number"
-          value={supplyApy}
-          onChange={(e) => setSupplyApy(e.target.value)}
-          inputProps={{ min: 0, max: 100, step: 0.01 }}
-          fullWidth
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          size="small"
-          label="Borrow APY (%)"
-          type="number"
-          value={borrowApy}
-          onChange={(e) => setBorrowApy(e.target.value)}
-          inputProps={{ min: 0, max: 100, step: 0.01 }}
-          fullWidth
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          size="small"
-          label="LTV (%)"
-          type="number"
-          value={ltv}
-          onChange={(e) => setLtv(e.target.value)}
-          inputProps={{ min: 0, max: 100, step: 1 }}
-          fullWidth
-        />
-      </DialogContent>
-      <DialogActions>
-        <Button size="small" onClick={handleClose}>
-          Cancel
-        </Button>
-        <Button size="small" variant="contained" onClick={handleAdd} disabled={!isValid}>
-          Add
-        </Button>
-      </DialogActions>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <DialogContent>
+          <Controller
+            name="code"
+            control={control}
+            render={({ field }) => (
+              <FormControl size="small" fullWidth sx={{ mt: 1, mb: 2 }} error={!!errors.code}>
+                <InputLabel>Asset</InputLabel>
+                <Select label="Asset" {...field}>
+                  {assets.map((a) => (
+                    <MenuItem key={a.code} value={a.code}>
+                      {a.code}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {errors.code && <FormHelperText>{errors.code.message}</FormHelperText>}
+              </FormControl>
+            )}
+          />
+          <TextField
+            size="small"
+            label="Supply APY (%)"
+            type="number"
+            fullWidth
+            sx={{ mb: 2 }}
+            slotProps={{ htmlInput: { min: 0, max: 100, step: 0.01 } }}
+            error={!!errors.supplyApy}
+            helperText={errors.supplyApy?.message}
+            {...register('supplyApy', { valueAsNumber: true })}
+          />
+          <TextField
+            size="small"
+            label="Borrow APY (%)"
+            type="number"
+            fullWidth
+            sx={{ mb: 2 }}
+            slotProps={{ htmlInput: { min: 0, max: 100, step: 0.01 } }}
+            error={!!errors.borrowApy}
+            helperText={errors.borrowApy?.message}
+            {...register('borrowApy', { valueAsNumber: true })}
+          />
+          <TextField
+            size="small"
+            label="LTV (%)"
+            type="number"
+            fullWidth
+            slotProps={{ htmlInput: { min: 0, max: 100, step: 1 } }}
+            error={!!errors.ltv}
+            helperText={errors.ltv?.message}
+            {...register('ltv', { valueAsNumber: true })}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button size="small" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button size="small" variant="contained" type="submit">
+            Add
+          </Button>
+        </DialogActions>
+      </form>
     </Dialog>
   )
 }
