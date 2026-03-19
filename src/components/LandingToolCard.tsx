@@ -13,6 +13,7 @@ import {
 } from '@mui/material'
 import { LandingSupplyDialog } from './LandingSupplyDialog'
 import { ConfirmDialog } from './ConfirmDialog'
+import { AddLandingAssetDialog } from './AddLandingAssetDialog'
 import { useToolsStore } from '../stores/toolsStore'
 
 type Balance = {
@@ -37,6 +38,7 @@ type Props = {
 export function LandingToolCard({ id, name, hf, walletId, balances }: Props) {
   const [supplyOpen, setSupplyOpen] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [addAssetOpen, setAddAssetOpen] = useState(false)
   const removeTool = useToolsStore((s) => s.removeTool)
 
   return (
@@ -46,6 +48,9 @@ export function LandingToolCard({ id, name, hf, walletId, balances }: Props) {
         subheader={`HF: ${hf !== null ? hf.toFixed(2) : '—'}`}
         action={
           <Stack direction="row" spacing={1}>
+            <Button size="small" variant="outlined" onClick={() => setAddAssetOpen(true)}>
+              Add Asset
+            </Button>
             <Button size="small" variant="outlined" onClick={() => setSupplyOpen(true)}>
               Supply
             </Button>
@@ -62,6 +67,11 @@ export function LandingToolCard({ id, name, hf, walletId, balances }: Props) {
         confirmLabel="Удалить"
         onConfirm={() => { removeTool(id); setConfirmOpen(false) }}
         onClose={() => setConfirmOpen(false)}
+      />
+      <AddLandingAssetDialog
+        open={addAssetOpen}
+        toolId={id}
+        onClose={() => setAddAssetOpen(false)}
       />
       <LandingSupplyDialog
         open={supplyOpen}

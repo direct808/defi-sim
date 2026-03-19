@@ -78,6 +78,8 @@ export function TransactionsWidget() {
         </CardContent>
       </Card>
 
+      <pre>{JSON.stringify(transactions, null, 2)}</pre>
+
       <ConfirmDialog
         open={confirmIndex !== null}
         title="Удалить транзакцию"

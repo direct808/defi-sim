@@ -10,11 +10,13 @@ import {
   Toolbar as MuiToolbar,
 } from '@mui/material'
 import { useWalletStore } from '../stores/walletStore'
+import { CreateLandingToolDialog } from './CreateLandingToolDialog'
 
 export function Toolbar() {
   const { wallets, add } = useWalletStore()
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
+  const [landingOpen, setLandingOpen] = useState(false)
 
   const handleAdd = () => {
     if (!name.trim()) return
@@ -35,6 +37,9 @@ export function Toolbar() {
         <MuiToolbar variant="dense">
           <Button size="small" variant="outlined" onClick={() => setOpen(true)}>
             Add Wallet
+          </Button>
+          <Button size="small" variant="outlined" onClick={() => setLandingOpen(true)} sx={{ ml: 1 }}>
+            Add Landing Tool
           </Button>
         </MuiToolbar>
       </AppBar>
@@ -62,6 +67,8 @@ export function Toolbar() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <CreateLandingToolDialog open={landingOpen} onClose={() => setLandingOpen(false)} />
     </>
   )
 }

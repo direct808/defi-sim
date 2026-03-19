@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useAssetStore } from '../stores/assetStore'
 import { useTransactionStore } from '../stores/transactionStore'
+import { useToolsStore } from '../stores/toolsStore'
 import {
   Button,
   Dialog,
@@ -25,10 +25,10 @@ export function LandingSupplyDialog({
   walletId,
   onClose,
 }: Props) {
-  const assets = useAssetStore((s) => s.assets)
+  const toolAssets = useToolsStore((s) => s.tools.find((t) => t.id === landingId)?.assets ?? [])
   const addTransaction = useTransactionStore((s) => s.add)
 
-  const [assetCode, setAssetCode] = useState(() => assets[0]?.code ?? '')
+  const [assetCode, setAssetCode] = useState(() => toolAssets[0]?.code ?? '')
   const [amount, setAmount] = useState('')
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10))
 
@@ -64,7 +64,7 @@ export function LandingSupplyDialog({
             onChange={(e) => setAssetCode(e.target.value)}
             fullWidth
           >
-            {assets.map((asset) => (
+            {toolAssets.map((asset) => (
               <MenuItem key={asset.code} value={asset.code}>
                 {asset.code}
               </MenuItem>
